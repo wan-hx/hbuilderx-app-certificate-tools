@@ -1,0 +1,60 @@
+{
+    "id": "app-certificate-tools",
+    "name": "手机app打包证书相关工具",
+    "description": "HBuilderX内，可视化的android证书生成、查看工具",
+    "displayName": "可视化的android证书生成查看工具",
+    "version": "0.0.3",
+    "author": "",
+    "publisher": "oneone",
+    "engines": {
+        "HBuilderX": "^3.2.6"
+    },
+    "categories": [
+        "Other"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yi-heng/hx_for_app_certificate_tools.git"
+    },
+    "git_url": "https://github.com/yi-heng/hx_for_app_certificate_tools.git",
+    "keywords": [
+        "可视化的android证书生成查看工具",
+        "keytool",
+        "手机app打包证书相关工具",
+        "java"
+    ],
+    "main": "./src/extension.js",
+    "activationEvents": [
+        "onCommand:app-certificate-tools.androidCreate",
+        "onCommand:app-certificate-tools.androidShow"
+    ],
+    "contributes": {
+        "commands": [{
+            "command": "app-certificate-tools.androidCreate",
+            "title": "生成Android证书"
+        }, {
+            "command": "app-certificate-tools.androidShow",
+            "title": "查看Android证书详情"
+        }],
+        "menus": {
+            "menubar/tool": [{
+                    "title": "App证书管理工具",
+                    "group": "ext_settings",
+                    "id": "app-certificate-tools"
+                },
+                {
+                    "command": "app-certificate-tools.androidCreate",
+                    "group": "app-certificate-tools@1"
+                },
+                {
+                    "command": "app-certificate-tools.androidShow",
+                    "group": "app-certificate-tools@2"
+                }
+            ]
+        }
+    },
+    "extensionDependencies": [
+        "plugin-manager"
+    ],
+    "dependencies": {}
+}
