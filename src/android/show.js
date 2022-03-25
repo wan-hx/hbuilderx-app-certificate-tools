@@ -50,10 +50,13 @@ async function androidCertificateShow() {
         formItems[0]['value'] = LastKeystoreFile;
     };
 
+    let footer = '<p style="color: #a0a0a0; font-size: 13px;">插件开发不易，请作者喝杯可乐 <a href="https://ext.dcloud.net.cn/plugin?name=app-certificate-tools">赞助</a></p>';
+
     let userInfo = await hx.window.showFormDialog({
         formItems: formItems,
         title: "Android证书查看详情",
         subtitle: "调用java keytool查看证书",
+        footer: footer,
         width: 640,
         height: 290,
         submitButtonText: "确定(&S)",

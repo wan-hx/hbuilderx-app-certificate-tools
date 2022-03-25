@@ -1,0 +1,6 @@
+{
+    "displayName": "可视化的android证书生成查看工具",
+    "menuAndroidCertCreate": "生成Android证书",
+    "menuAndroidCertDetails": "查看Android证书详情",
+    "menuAppCert": "App证书管理"
+}

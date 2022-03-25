@@ -150,10 +150,13 @@ async function androidCertificateCreate() {
     let keytool = await getKeytool();
     if (keytool == "error") return;
 
+    let footer = '<p style="color: #a0a0a0; font-size: 13px;">插件开发不易，请作者喝杯可乐 <a href="https://ext.dcloud.net.cn/plugin?name=app-certificate-tools">赞助</a></p>';
+
     let userInfo = await hx.window.showFormDialog({
         formItems: formItems,
         title: "Android证书生成可视化界面",
         subtitle: "调用java keytool生成证书。如果您是用来上架应用市场，乱填会影响上架，请规范填写。",
+        footer: footer,
         width: 600,
         height: 480,
         submitButtonText: "确定(&S)",
@@ -187,11 +190,11 @@ async function androidCertificateCreate() {
 
     // 控制台打印命令
     if (keytool != 'keytool') {
-        createOutputChannel("备注：当前操作，使用的是HBuilderX内置Java keytool工具。", "info");
+        createOutputChannel("备注：当前操作，使用的是HBuilderX内置Java keytool工具。\n", "info");
         let keytoolDir = path.dirname(keytool);
         process.chdir(keytoolDir);
     } else {
-        createOutputChannel("备注：当前操作，使用的是电脑自身已安装的Java keytool工具。", "info");
+        createOutputChannel("备注：当前操作，使用的是电脑自身已安装的Java keytool工具。\n", "info");
     }
     createOutputChannel(`运行的命令为：${cmd} \n`);
 

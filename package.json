@@ -2,7 +2,7 @@
     "id": "app-certificate-tools",
     "name": "手机app打包证书相关工具",
     "description": "HBuilderX内，可视化的android证书生成、查看工具",
-    "displayName": "可视化的android证书生成查看工具",
+    "displayName": "%displayName%",
     "version": "0.0.3",
     "author": "",
     "publisher": "oneone",
@@ -31,14 +31,14 @@
     "contributes": {
         "commands": [{
             "command": "app-certificate-tools.androidCreate",
-            "title": "生成Android证书"
+            "title": "%menuAndroidCertCreate%"
         }, {
             "command": "app-certificate-tools.androidShow",
-            "title": "查看Android证书详情"
+            "title": "%menuAndroidCertDetails%"
         }],
         "menus": {
             "menubar/tool": [{
-                    "title": "App证书管理工具",
+                    "title": "%menuAppCert%",
                     "group": "ext_settings",
                     "id": "app-certificate-tools"
                 },

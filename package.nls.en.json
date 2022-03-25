@@ -1,0 +1,6 @@
+{
+    "displayName": "Android certificate generation tool",
+    "menuAndroidCertCreate": "Android Certificate Generation",
+    "menuAndroidCertDetails": "Android Certificate Details",
+    "menuAppCert": "App Cert management"
+}

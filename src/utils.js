@@ -10,7 +10,7 @@ const osName = os.platform();
 const hx_keytool = path.join(hx.env.appRoot, "plugins", "jre", "bin", "keytool");
 
 const viewID = "android.key";
-const viewTitle = "anroid证书";
+const viewTitle = "Android证书";
 
 /**
  * @description 获取keytool命令
