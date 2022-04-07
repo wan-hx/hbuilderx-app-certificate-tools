@@ -3,7 +3,7 @@
     "name": "手机app打包证书相关工具",
     "description": "HBuilderX内，可视化的android证书生成、查看工具",
     "displayName": "%displayName%",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "author": "",
     "publisher": "oneone",
     "engines": {
@@ -14,9 +14,9 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/yi-heng/hx_for_app_certificate_tools.git"
+        "url": "https://github.com/yi-heng/hbuilderx-for-app-certificate-tools.git"
     },
-    "git_url": "https://github.com/yi-heng/hx_for_app_certificate_tools.git",
+    "git_url": "https://github.com/yi-heng/hbuilderx-for-app-certificate-tools.git",
     "keywords": [
         "可视化的android证书生成查看工具",
         "keytool",
@@ -29,15 +29,19 @@
         "onCommand:app-certificate-tools.androidShow"
     ],
     "contributes": {
-        "commands": [{
-            "command": "app-certificate-tools.androidCreate",
-            "title": "%menuAndroidCertCreate%"
-        }, {
-            "command": "app-certificate-tools.androidShow",
-            "title": "%menuAndroidCertDetails%"
-        }],
+        "commands": [
+            {
+                "command": "app-certificate-tools.androidCreate",
+                "title": "%menuAndroidCertCreate%"
+            },
+            {
+                "command": "app-certificate-tools.androidShow",
+                "title": "%menuAndroidCertDetails%"
+            }
+        ],
         "menus": {
-            "menubar/tool": [{
+            "menubar/tool": [
+                {
                     "title": "%menuAppCert%",
                     "group": "ext_settings",
                     "id": "app-certificate-tools"
@@ -56,5 +60,7 @@
     "extensionDependencies": [
         "plugin-manager"
     ],
-    "dependencies": {}
+    "dependencies": {
+        "iconv-lite": "^0.6.3"
+    }
 }

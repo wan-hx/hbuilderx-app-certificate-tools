@@ -2,6 +2,7 @@ const fs =require('fs');
 const path = require('path');
 const hx = require('hbuilderx');
 const { spawn, exec } = require('child_process');
+const iconv = require('iconv-lite');
 
 const os = require('os');
 const osName = os.platform();
@@ -39,6 +40,24 @@ function getKeytool() {
     });
 };
 
+/**
+ * @description 输出java版本
+ */
+function printJavaVersion() {
+    let cmd = "java -version";
+    return new Promise((resolve, reject) => {
+        exec(cmd, function(error, stdout, stderr) {
+            if (error) {
+                reject(error)
+            } else {
+                let msg = "Java版本信息：\n" + stderr.toString() + "\n";
+                createOutputChannel(msg, "info");
+                resolve('success');
+            };
+        });
+    });
+};
+
 
 /**
  * @description 以当前时间生成文件名
@@ -61,78 +80,61 @@ function getFileNameForDate() {
 
 
 /**
- * @description 创建输出控制台
- * @param {String} msg
- * @param {String} msgLevel (warning | success | error | info), 控制文本颜色
- */
-function createOutputChannel(msg, msgLevel = 'info') {
-    let output = hx.window.createOutputView({
-        id: viewID,
-        title: viewTitle
-    });
-    output.show();
-
-    if (['warning', 'success', 'error', 'info'].includes(msgLevel)) {
-        output.appendLine({line: msg, level: msgLevel});
-    } else {
-        output.appendLine(msg);
-    };
-};
-
-/**
  * @description 创建输出控制台, 支持文件链接跳转
  * @param {String} msg
  * @param {String} msgLevel (warning | success | error | info), 控制文本颜色
- * @param {String} viewID 目前的值仅为: 'log'
- * @param {String} runDir 程序执行目录
+ * @param {String} linkText 链接文本
  */
-function createOutputViewForHyperLinks(msg, msgLevel='info', runDir) {
-    let outputView = hx.window.createOutputView({
-        id: viewID,
-        title: viewTitle
-    });
+function createOutputChannel(msg, msgLevel = 'info', linkText) {
+    let outputView = hx.window.createOutputView({ "id": "Android", "title": "Android-Cert" });
     outputView.show();
 
-    let filepath, start;
-    if (msg.includes('Test results written to:')) {
-        start = "Test results written to: ".length;
-        let tmp = msg.substring(start, msg.length);
-        filepath = path.resolve(runDir, tmp);
+    if (linkText == undefined || linkText == '') {
+        outputView.appendLine({
+            line: msg,
+            level: msgLevel,
+        });
+        return;
     };
+
+    let start;
+    if (msg.includes(linkText) && linkText != undefined) {
+        start = msg.indexOf(linkText);
+    };
+
     outputView.appendLine({
         line: msg,
         level: msgLevel,
-        hyperlinks:[
+        hyperlinks: [
             {
                 linkPosition: {
                     start: start,
-                    end: msg.length
+                    end: start + linkText.length
                 },
-                onOpen: function() {
-                    filepath = filepath.trim();
-                    hx.workspace.openTextDocument(filepath);
-                    setTimeout(function() {
-                        hx.commands.executeCommand('editor.action.format');
-                        hx.commands.executeCommand('workbench.action.files.save');
-                    }, 100);
-                }
+                onOpen: function () {}
             }
         ]
     });
 };
 
+/**
+ * @description 输出到文件
+ * @param {Object} text
+ */
 async function applyEdit(text) {
     await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
-    await hx.window.getActiveTextEditor().then((editor) => {
-        let workspaceEdit = new hx.WorkspaceEdit();
-        let edits = [];
-        edits.push(new hx.TextEdit({
-            start: 0,
-            end: 0
-        }, text));
-        workspaceEdit.set(editor.document.uri, edits);
-        hx.workspace.applyEdit(workspaceEdit);
-    });
+    setTimeout(function() {
+        hx.window.getActiveTextEditor().then((editor) => {
+            let workspaceEdit = new hx.WorkspaceEdit();
+            let edits = [];
+            edits.push(new hx.TextEdit({
+                start: 0,
+                end: 0
+            }, text));
+            workspaceEdit.set(editor.document.uri, edits);
+            hx.workspace.applyEdit(workspaceEdit);
+        });
+    }, 1000);
 };
 
 /**
@@ -173,7 +175,7 @@ function hxShowMessageBox(title, text, buttons = ['关闭']) {
  */
 function runCmd(cmd = '') {
     return new Promise((resolve, reject) => {
-        var workerProcess = exec(cmd, function(error, stdout, stderr) {
+        var workerProcess = exec(cmd, { encoding: 'buffer' }, function(error, stdout, stderr) {
             if (error) {
                 createOutputChannel(`命令运行错误: ${error}\n`, 'error');
                 reject('run_error');
@@ -182,7 +184,14 @@ function runCmd(cmd = '') {
                 createOutputChannel(`${stderr}\n`, 'info');
             };
             if (stderr.length != 0) {
-                createOutputChannel(`${stderr}\n`, 'warning');
+                let stdoutMsg;
+                if (osName == "win32") {
+                    let fmsg = iconv.decode(Buffer.from(stderr, 'binary'), 'cp936');
+                    stdoutMsg = (fmsg.toString()).trim();
+                } else {
+                    stdoutMsg = (stderr.toString()).trim();
+                }
+                createOutputChannel(`${stdoutMsg}\n`, 'warning');
             };
         });
         workerProcess.on('exit', function (code) {
@@ -209,11 +218,25 @@ function runCmdForShow(cmd, opts = {}) {
 
     var msg = '';
     ls.stdout.on('data', function(data) {
-        msg = msg + data;
+        let stdoutMsg;
+        if (osName != 'darwin') {
+            stdoutMsg = iconv.decode(Buffer.from(data, 'binary'), 'cp936')
+            stdoutMsg = stdoutMsg.toString();
+        } else {
+            stdoutMsg = data.toString();
+        };
+        msg = msg + stdoutMsg;
     });
 
     ls.stderr.on('data', function(data) {
-        msg = msg + data;
+        let stderrMsg;
+        if (osName != 'darwin') {
+            stderrMsg = iconv.decode(Buffer.from(data, 'binary'), 'cp936')
+            stderrMsg = stderrMsg.toString();
+        } else {
+            stderrMsg = data.toString();
+        };
+        msg = msg + stderrMsg;
         if (data.includes('输入密钥库口令')) {
             createOutputChannel("查看证书，必须提供证书密码。\n", "error");
         };
@@ -237,5 +260,6 @@ module.exports = {
     runCmdForShow,
     getKeytool,
     createOutputChannel,
-    getFileNameForDate
+    getFileNameForDate,
+    printJavaVersion
 };

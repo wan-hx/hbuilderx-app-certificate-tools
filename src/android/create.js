@@ -7,7 +7,8 @@ const {
     getKeytool,
     getFileNameForDate,
     hxShowMessageBox,
-    createOutputChannel
+    createOutputChannel,
+    printJavaVersion
 } = require('../utils.js');
 
 let formItems = [
@@ -115,6 +116,10 @@ async function goValidate(formData, that) {
                 that.showError(`路径 ${saveDir} 必须是目录，请重新填写。`);
                 return false;
             };
+            if (saveDir.indexOf(" ") != -1) {
+                that.showError(`证书存放目录路径存在空格，会导致命令行执行失败，请重新填写。`);
+                return false;
+            };
         }catch(e){
             that.showError(`路径 ${saveDir} 不存在。`);
             return false;
@@ -190,19 +195,20 @@ async function androidCertificateCreate() {
 
     // 控制台打印命令
     if (keytool != 'keytool') {
-        createOutputChannel("备注：当前操作，使用的是HBuilderX内置Java keytool工具。\n", "info");
+        createOutputChannel("备注：当前操作，使用的是HBuilderX内置Java keytool工具。\n", "error");
         let keytoolDir = path.dirname(keytool);
         process.chdir(keytoolDir);
     } else {
-        createOutputChannel("备注：当前操作，使用的是电脑自身已安装的Java keytool工具。\n", "info");
-    }
+        createOutputChannel("备注：当前操作，使用的是操作系统自身已安装的Java keytool工具。\n", "error");
+        await printJavaVersion();
+    };
     createOutputChannel(`运行的命令为：${cmd} \n`);
 
     let result = await runCmd(cmd);
     console.error('Android证书生成，命令行运行结果: ', result);
 
     if (result == "run_end") {
-        createOutputChannel(`Android证书生成成功。路径：${outputFilePath}`, 'success');
+        createOutputChannel(`Android证书生成成功。路径：${outputFilePath}`, 'success', outputFilePath);
         createOutputChannel(`提示：请妥善保存您的证书、密码、以及证书生成命令等信息，丢失后无法找回。\n`, 'info');
         hxShowMessageBox("Android证书生成成功", `路径：${outputFilePath} \n\n 注意：\n1. 请妥善保存您的证书、密码、以及证书生成命令等信息，丢失后无法找回。 \n2. 证书有效期为${validity}天。`, ["我知道了"]);
     } else {
